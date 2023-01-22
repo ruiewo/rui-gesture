@@ -10,8 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Enums\" />
     <Folder Include="ViewModels\" />
-    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
