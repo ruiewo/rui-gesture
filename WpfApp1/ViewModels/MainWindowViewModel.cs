@@ -49,7 +49,6 @@ public class MainWindowViewModel
             var b = (LowLevelMouseHook.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam,
                 typeof(LowLevelMouseHook.MSLLHOOKSTRUCT));
 
-            Debug.WriteLine(a.ToString());
             // 何か処理をする
             if (a == LowLevelMouseHook.Event.WM_LBUTTONDOWN)
             {
