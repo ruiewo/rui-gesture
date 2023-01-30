@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-
-namespace RuiGesture.Models;
+﻿namespace RuiGesture.Models;
 
 public class GestureHandler
 {
