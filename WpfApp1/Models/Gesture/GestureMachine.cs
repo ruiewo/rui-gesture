@@ -11,9 +11,9 @@ using Event;
 
 public class GestureMachine : GestureMachineAbs
 {
-    private readonly CallbackManager customCallbackManager;
+    private readonly CallbackManagerImpl customCallbackManager;
 
-    public GestureMachine(CallbackManager callbackManager) : base(callbackManager, new ContextManager())
+    public GestureMachine(CallbackManagerImpl callbackManager) : base(callbackManager, new ContextManager())
     {
         customCallbackManager = callbackManager;
     }

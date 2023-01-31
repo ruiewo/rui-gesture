@@ -21,7 +21,6 @@
   <ItemGroup>
     <Folder Include="Models\Enums\" />
     <Folder Include="Models\Config\" />
-    <Folder Include="Models\Event\" />
     <Folder Include="Models\DSL\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
