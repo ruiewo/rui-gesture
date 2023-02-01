@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace RuiGesture.Models;
+
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using RuiGesture.Models;
-
-namespace Crevice.UI;
-
-using Core.FSM;
-using UserScript;
-using RuiGesture.Models.Gesture;
-using RuiGesture.Models.Core;
-using RuiGesture.Models.UserScript;
+using Core;
+using Gesture;
 
 public partial class ReloadableMainForm : MainFormBase
 {
@@ -27,7 +17,8 @@ public partial class ReloadableMainForm : MainFormBase
         : base(launcherForm)
     {
         _reloadableGestureMachine = new ReloadableGestureMachine(launcherForm.Config, this);
-        _userScriptWatcher = new UserScript.DirectoryWatcher(this, launcherForm.Config.UserDirectory, "*.csx");
+        _userScriptWatcher =
+            new UserScript.UserScript.DirectoryWatcher(this, launcherForm.Config.UserDirectory, "*.csx");
         InitializeComponent();
     }
 

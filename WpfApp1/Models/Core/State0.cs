@@ -4,11 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class State0<TConfig, TContextManager> : State<TConfig, TContextManager>
-    where TConfig : GestureMachineConfig
+public class State0<TContextManager> : State<TContextManager>
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
-    public readonly GestureMachine<TConfig, TContextManager> Machine;
+    public readonly GestureMachine<TContextManager> Machine;
     public readonly IReadOnlyRootElement RootElement;
 
     public readonly IDictionary<FireEvent, IReadOnlyList<IReadOnlyWhenElement>>
@@ -21,7 +20,7 @@ public class State0<TConfig, TContextManager> : State<TConfig, TContextManager>
         InversedDecomposedTrigger;
 
     public State0(
-        GestureMachine<TConfig, TContextManager> machine,
+        GestureMachine<TContextManager> machine,
         IReadOnlyRootElement rootElement)
         : base(0)
     {
@@ -34,7 +33,7 @@ public class State0<TConfig, TContextManager> : State<TConfig, TContextManager>
         InversedDecomposedTrigger = GetInversedDecomposedTrigger(RootElement);
     }
 
-    public override Result<TConfig, TContextManager> Input(IPhysicalEvent evnt)
+    public override Result<TContextManager> Input(IPhysicalEvent evnt)
     {
         if (evnt is PhysicalFireEvent fireEvent && IsSingleThrowTrigger(fireEvent))
         {
@@ -58,7 +57,7 @@ public class State0<TConfig, TContextManager> : State<TConfig, TContextManager>
                 if (doubleThrowElements.Any())
                 {
                     Machine.ContextManager.ExecutePressExecutors(ctx, doubleThrowElements);
-                    var nextState = new StateN<TConfig, TContextManager>(
+                    var nextState = new StateN<TContextManager>(
                         Machine,
                         ctx,
                         History.Create(pressEvent.Opposition, this),

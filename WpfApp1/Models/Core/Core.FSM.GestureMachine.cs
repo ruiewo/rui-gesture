@@ -3,6 +3,7 @@
 using System;
 using System.Drawing;
 using System.Threading.Tasks;
+using Config;
 
 public interface IGestureMachine
 {
@@ -13,12 +14,11 @@ public interface IGestureMachine
     void Reset();
 }
 
-public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine, IDisposable
-    where TConfig : GestureMachineConfig
+public abstract class GestureMachine<TContextManager> : IGestureMachine, IDisposable
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
-    public readonly TConfig Config;
-    public readonly CallbackManager<TConfig, TContextManager> CallbackManager;
+    public readonly GestureMachineConfig Config;
+    public readonly CallbackManager<TContextManager> CallbackManager;
     public readonly TContextManager ContextManager;
 
     protected readonly object lockObject = new();
@@ -27,33 +27,33 @@ public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine
 
     internal readonly EventCounter<PhysicalReleaseEvent> invalidEvents = new();
 
-    public IReadOnlyRootElement<EvaluationContext, ExecutionContext> RootElement { get; internal set; }
+    public IReadOnlyRootElement RootElement { get; internal set; }
 
     public StrokeWatcher StrokeWatcher { get; internal set; }
 
-    private State<TConfig, TContextManager> _currentState = null;
+    private State<TContextManager> currentState = null;
 
-    public State<TConfig, TContextManager> CurrentState
+    public State<TContextManager> CurrentState
     {
-        get => _currentState;
+        get => currentState;
 
         internal set
         {
-            if (_currentState != value)
+            if (currentState != value)
             {
                 ResetStrokeWatcher();
-                if (value is State0<TConfig, TContextManager>)
+                if (value is State0<TContextManager>)
                 {
                     StopGestureTimeoutTimer();
                 }
-                else if (value is StateN<TConfig, TContextManager>)
+                else if (value is StateN<TContextManager>)
                 {
                     ResetGestureTimeoutTimer();
                 }
 
-                var lastState = _currentState;
-                _currentState = value;
-                CallbackManager.OnStateChanged(this, lastState, _currentState);
+                var lastState = currentState;
+                currentState = value;
+                CallbackManager.OnStateChanged(this, lastState, currentState);
             }
         }
     }
@@ -61,8 +61,8 @@ public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine
     protected internal virtual TaskFactory StrokeWatcherTaskFactory => Task.Factory;
 
     public GestureMachine(
-        TConfig config,
-        CallbackManager<TConfig, TContextManager> callbackManager,
+        GestureMachineConfig config,
+        CallbackManager<TContextManager> callbackManager,
         TContextManager contextManager)
     {
         Config = config;
@@ -74,7 +74,7 @@ public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine
 
     public bool IsRunning { get; internal set; } = false;
 
-    public virtual void Run(IReadOnlyRootElement<EvaluationContext, ExecutionContext> rootElement)
+    public virtual void Run(IReadOnlyRootElement rootElement)
     {
         lock (lockObject)
         {
@@ -83,7 +83,7 @@ public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine
                 throw new InvalidOperationException();
             }
 
-            CurrentState = new State0<TConfig, TContextManager>(this, rootElement);
+            CurrentState = new State0<TContextManager>(this, rootElement);
             RootElement = rootElement;
             IsRunning = true;
             CallbackManager.OnMachineStart(this);
@@ -96,7 +96,7 @@ public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine
     {
         lock (lockObject)
         {
-            if (point.HasValue && CurrentState is StateN<TConfig, TContextManager>)
+            if (point.HasValue && CurrentState is StateN<TContextManager>)
             {
                 StrokeWatcher.Process(point.Value);
             }
@@ -159,7 +159,7 @@ public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine
     {
         lock (lockObject)
         {
-            if (CurrentState is StateN<TConfig, TContextManager> lastState)
+            if (CurrentState is StateN<TContextManager> lastState)
             {
                 var state = CurrentState;
                 var _state = CurrentState.Timeout();
@@ -183,7 +183,7 @@ public abstract class GestureMachine<TConfig, TContextManager> : IGestureMachine
         lock (lockObject)
         {
             var lastState = CurrentState;
-            if (CurrentState is StateN<TConfig, TContextManager>)
+            if (CurrentState is StateN<TContextManager>)
             {
                 var state = CurrentState;
                 var _state = CurrentState.Reset();

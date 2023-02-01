@@ -3,16 +3,15 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class HistoryRecord<TConfig, TContextManager>
-    where TConfig : GestureMachineConfig
+public class HistoryRecord<TContextManager>
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
     public readonly PhysicalReleaseEvent ReleaseEvent;
-    public readonly State<TConfig, TContextManager> State;
+    public readonly State<TContextManager> State;
 
     public HistoryRecord(
         PhysicalReleaseEvent releaseEvent,
-        State<TConfig, TContextManager> state)
+        State<TContextManager> state)
     {
         ReleaseEvent = releaseEvent;
         State = state;
@@ -21,26 +20,24 @@ public class HistoryRecord<TConfig, TContextManager>
 
 public static class HistoryRecord
 {
-    public static HistoryRecord<TConfig, TContextManager>
-        Create<TConfig, TContextManager>(
+    public static HistoryRecord<TContextManager>
+        Create<TContextManager>(
             PhysicalReleaseEvent releaseEvent,
-            State<TConfig, TContextManager> state)
-        where TConfig : GestureMachineConfig
+            State<TContextManager> state)
         where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
     {
-        return new HistoryRecord<TConfig, TContextManager>(releaseEvent, state);
+        return new HistoryRecord<TContextManager>(releaseEvent, state);
     }
 }
 
-public class HistoryQueryResult<TConfig, TContextManager>
-    where TConfig : GestureMachineConfig
+public class HistoryQueryResult<TContextManager>
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
-    public readonly State<TConfig, TContextManager> FoundState;
+    public readonly State<TContextManager> FoundState;
     public readonly IReadOnlyList<PhysicalReleaseEvent> SkippedReleaseEvents;
 
     public HistoryQueryResult(
-        State<TConfig, TContextManager> foundState,
+        State<TContextManager> foundState,
         IReadOnlyList<PhysicalReleaseEvent> skippedReleaseEvents)
     {
         FoundState = foundState;
@@ -48,64 +45,59 @@ public class HistoryQueryResult<TConfig, TContextManager>
     }
 }
 
-public class History<TConfig, TContextManager>
-    where TConfig : GestureMachineConfig
+public class History<TContextManager>
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
-    public readonly IReadOnlyList<HistoryRecord<TConfig, TContextManager>> Records;
+    public readonly IReadOnlyList<HistoryRecord<TContextManager>> Records;
 
     public History(
         PhysicalReleaseEvent releaseEvent,
-        State<TConfig, TContextManager> state)
-        : this(new List<HistoryRecord<TConfig, TContextManager>>()
+        State<TContextManager> state)
+        : this(new List<HistoryRecord<TContextManager>>()
         {
             HistoryRecord.Create(releaseEvent, state),
         })
     {
     }
 
-    public History(IReadOnlyList<HistoryRecord<TConfig, TContextManager>> records)
+    public History(IReadOnlyList<HistoryRecord<TContextManager>> records)
     {
         Records = records;
     }
 
-    public HistoryQueryResult<TConfig, TContextManager>
+    public HistoryQueryResult<TContextManager>
         Query(PhysicalReleaseEvent releaseEvent)
     {
         var nextHistory = Records.TakeWhile(t => t.ReleaseEvent != releaseEvent);
         var foundState = Records[nextHistory.Count()].State;
         var skippedReleaseEvents = Records.Skip(nextHistory.Count()).Select(t => t.ReleaseEvent).ToList();
-        return new HistoryQueryResult<TConfig, TContextManager>(foundState,
+        return new HistoryQueryResult<TContextManager>(foundState,
             skippedReleaseEvents);
     }
 
-    public History<TConfig, TContextManager>
-        CreateNext(PhysicalReleaseEvent releaseEvent, State<TConfig, TContextManager> state)
+    public History<TContextManager>
+        CreateNext(PhysicalReleaseEvent releaseEvent, State<TContextManager> state)
     {
         var newRecords = Records.ToList();
         newRecords.Add(HistoryRecord.Create(releaseEvent, state));
-        return new History<TConfig, TContextManager>(newRecords);
+        return new History<TContextManager>(newRecords);
     }
 }
 
 public static class History
 {
-    public static History<TConfig, TContextManager>
-        Create<TConfig, TContextManager>(
-            PhysicalReleaseEvent releaseEvent,
-            State<TConfig, TContextManager> state)
-        where TConfig : GestureMachineConfig
+    public static History<TContextManager>
+        Create<TContextManager>(PhysicalReleaseEvent releaseEvent, State<TContextManager> state)
         where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
     {
-        return new History<TConfig, TContextManager>(releaseEvent, state);
+        return new History<TContextManager>(releaseEvent, state);
     }
 
-    public static History<TConfig, TContextManager>
-        Create<TConfig, TContextManager>(
-            IReadOnlyList<HistoryRecord<TConfig, TContextManager>> records)
-        where TConfig : GestureMachineConfig
+    public static History<TContextManager>
+        Create<TContextManager>(
+            IReadOnlyList<HistoryRecord<TContextManager>> records)
         where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
     {
-        return new History<TConfig, TContextManager>(records);
+        return new History<TContextManager>(records);
     }
 }

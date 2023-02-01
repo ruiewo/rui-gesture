@@ -1,23 +1,12 @@
-﻿using System;
+﻿namespace RuiGesture.Models;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace Crevice.UI;
-
-using UserScript;
-using RuiGesture.Models.Gesture;
-using RuiGesture.Models.WinApi;
-using RuiGesture.Models.UserScript;
+using Gesture;
+using Console = WinApi.Console;
 
 public class MainFormBase : MouseGestureForm
 {
@@ -141,7 +130,7 @@ public class MainFormBase : MouseGestureForm
     public void ShowErrorBalloon(
         System.Collections.Immutable.ImmutableArray<Microsoft.CodeAnalysis.Diagnostic> errors)
     {
-        var errorMessage = UserScript.GetPrettyErrorMessage(errors);
+        var errorMessage = UserScript.UserScript.GetPrettyErrorMessage(errors);
         LauncherForm.LastErrorMessage = errorMessage;
 
         var title = "UserScript Compilation Error";

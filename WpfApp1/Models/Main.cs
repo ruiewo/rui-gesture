@@ -60,8 +60,8 @@ internal static class Program
         var config = new GlobalConfig(cliOption);
         PrepareUserScript(config);
 
-        var launcherForm = new UI.LauncherForm(config);
-        var mainForm = new UI.ReloadableMainForm(launcherForm);
+        var launcherForm = new LauncherForm(config);
+        var mainForm = new ReloadableMainForm(launcherForm);
         launcherForm.MainForm = mainForm;
         Application.Run(launcherForm);
     }

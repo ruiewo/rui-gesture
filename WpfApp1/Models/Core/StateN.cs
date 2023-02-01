@@ -4,15 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-public class StateN<TConfig, TContextManager>
-    : State<TConfig, TContextManager>
-    where TConfig : GestureMachineConfig
+public class StateN<TContextManager> : State<TContextManager>
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
-    public readonly GestureMachine<TConfig, TContextManager> Machine;
+    public readonly GestureMachine<TContextManager> Machine;
 
     public readonly EvaluationContext Ctx;
-    public readonly History<TConfig, TContextManager> History;
+    public readonly History<TContextManager> History;
     public readonly IReadOnlyList<IReadOnlyDoubleThrowElement> DoubleThrowElements;
     public readonly bool CanCancel;
 
@@ -39,9 +37,9 @@ public class StateN<TConfig, TContextManager>
         => AbnormalEndTriggers.Contains(releaseEvent);
 
     public StateN(
-        GestureMachine<TConfig, TContextManager> machine,
+        GestureMachine<TContextManager> machine,
         EvaluationContext ctx,
-        History<TConfig, TContextManager> history,
+        History<TContextManager> history,
         IReadOnlyList<IReadOnlyDoubleThrowElement> doubleThrowElements,
         int depth,
         bool canCancel = true)
@@ -62,7 +60,7 @@ public class StateN<TConfig, TContextManager>
         AbnormalEndTriggers = GetAbnormalEndTriggers(History.Records);
     }
 
-    public override Result<TConfig, TContextManager> Input(IPhysicalEvent evnt)
+    public override Result<TContextManager> Input(IPhysicalEvent evnt)
     {
         if (evnt is PhysicalFireEvent fireEvent && IsSingleThrowTrigger(fireEvent))
         {
@@ -130,7 +128,7 @@ public class StateN<TConfig, TContextManager>
                     return Result.Create(true, LastState);
                 }
 
-                if (LastState is StateN<TConfig, TContextManager> stateN)
+                if (LastState is StateN<TContextManager> stateN)
                 {
                     return Result.Create(true, stateN.ToNonCancellableClone());
                 }
@@ -143,7 +141,7 @@ public class StateN<TConfig, TContextManager>
                 Machine.invalidEvents.IgnoreNext(queryResult.SkippedReleaseEvents);
 
                 if (!CanCancel &&
-                    queryResult.FoundState is StateN<TConfig, TContextManager> stateN)
+                    queryResult.FoundState is StateN<TContextManager> stateN)
                 {
                     return Result.Create(true, stateN.ToNonCancellableClone());
                 }
@@ -161,7 +159,7 @@ public class StateN<TConfig, TContextManager>
         return base.Input(evnt);
     }
 
-    public override State<TConfig, TContextManager> Timeout()
+    public override State<TContextManager> Timeout()
     {
         if (CanCancel &&
             !HasPressExecutors && !HasDoExecutors && !HasReleaseExecutors &&
@@ -173,25 +171,25 @@ public class StateN<TConfig, TContextManager>
         return this;
     }
 
-    public override State<TConfig, TContextManager> Reset()
+    public override State<TContextManager> Reset()
     {
         Machine.invalidEvents.IgnoreNext(NormalEndTrigger);
         Machine.ContextManager.ExecuteReleaseExecutors(Ctx, DoubleThrowElements);
         return LastState;
     }
 
-    private StateN<TConfig, TContextManager> ToNonCancellableClone()
+    private StateN<TContextManager> ToNonCancellableClone()
         => new(
             Machine, Ctx, History, DoubleThrowElements, Depth, false);
 
-    private StateN<TConfig, TContextManager> CreateCancellableNextState(
+    private StateN<TContextManager> CreateCancellableNextState(
         PhysicalPressEvent pressEvent,
         IReadOnlyList<IReadOnlyDoubleThrowElement> doubleThrowElements)
         => new(
             Machine, Ctx, History.CreateNext(pressEvent.Opposition, this),
             doubleThrowElements, Depth + 1, true);
 
-    private StateN<TConfig, TContextManager> CreateNonCancellableNextState(
+    private StateN<TContextManager> CreateNonCancellableNextState(
         PhysicalPressEvent pressEvent,
         IReadOnlyList<IReadOnlyDoubleThrowElement> doubleThrowElements)
         => new(
@@ -206,7 +204,7 @@ public class StateN<TConfig, TContextManager>
     public bool IsNormalEndTrigger(PhysicalReleaseEvent releaseEvent)
         => NormalEndTrigger == releaseEvent;
 
-    public State<TConfig, TContextManager> LastState => History.Records.Last().State;
+    public State<TContextManager> LastState => History.Records.Last().State;
 
     public new bool HasPressExecutors => HasPressExecutors(DoubleThrowElements);
 
@@ -214,11 +212,11 @@ public class StateN<TConfig, TContextManager>
 
     public new bool HasReleaseExecutors => HasReleaseExecutors(DoubleThrowElements);
 
-    public IReadOnlyList<HistoryRecord<TConfig, TContextManager>>
+    public IReadOnlyList<HistoryRecord<TContextManager>>
         CreateHistory(
-            IReadOnlyList<HistoryRecord<TConfig, TContextManager>> history,
+            IReadOnlyList<HistoryRecord<TContextManager>> history,
             PhysicalPressEvent pressEvent,
-            State<TConfig, TContextManager> state)
+            State<TContextManager> state)
     {
         var newHistory = history.ToList();
         newHistory.Add(HistoryRecord.Create(pressEvent.Opposition, state));
@@ -226,12 +224,12 @@ public class StateN<TConfig, TContextManager>
     }
 
     private static IReadOnlyCollection<PhysicalReleaseEvent>
-        GetEndTriggers(IReadOnlyList<HistoryRecord<TConfig, TContextManager>> history)
+        GetEndTriggers(IReadOnlyList<HistoryRecord<TContextManager>> history)
         => new HashSet<PhysicalReleaseEvent>(from h in history select h.ReleaseEvent);
 
     private static IReadOnlyCollection<PhysicalReleaseEvent>
         GetAbnormalEndTriggers(
-            IReadOnlyList<HistoryRecord<TConfig, TContextManager>> history)
+            IReadOnlyList<HistoryRecord<TContextManager>> history)
         => new HashSet<PhysicalReleaseEvent>(from h in history.Reverse().Skip(1) select h.ReleaseEvent);
 
     public bool IsSingleThrowTrigger(PhysicalFireEvent fireEvent)

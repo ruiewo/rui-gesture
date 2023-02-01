@@ -3,8 +3,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public abstract class State<TConfig, TContextManager>
-    where TConfig : GestureMachineConfig
+public abstract class State<TContextManager>
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
     public int Depth { get; }
@@ -14,13 +13,13 @@ public abstract class State<TConfig, TContextManager>
         Depth = depth;
     }
 
-    public virtual Result<TConfig, TContextManager> Input(IPhysicalEvent evnt)
+    public virtual Result<TContextManager> Input(IPhysicalEvent evnt)
         => Result.Create(false, this);
 
-    public virtual State<TConfig, TContextManager> Timeout()
+    public virtual State<TContextManager> Timeout()
         => this;
 
-    public virtual State<TConfig, TContextManager> Reset()
+    public virtual State<TContextManager> Reset()
         => this;
 
     protected static bool HasPressExecutors(
@@ -35,12 +34,12 @@ public abstract class State<TConfig, TContextManager>
         IReadOnlyList<IReadOnlyDoubleThrowElement> doubleThrowElements)
         => doubleThrowElements.Any(d => d.ReleaseExecutors.Any());
 
-    public bool IsState0 => GetType() == typeof(State0<TConfig, TContextManager>);
-    public bool IsStateN => GetType() == typeof(StateN<TConfig, TContextManager>);
+    public bool IsState0 => GetType() == typeof(State0<TContextManager>);
+    public bool IsStateN => GetType() == typeof(StateN<TContextManager>);
 
-    public State0<TConfig, TContextManager> AsState0()
-        => this as State0<TConfig, TContextManager>;
+    public State0<TContextManager> AsState0()
+        => this as State0<TContextManager>;
 
-    public StateN<TConfig, TContextManager> AsStateN()
-        => this as StateN<TConfig, TContextManager>;
+    public StateN<TContextManager> AsStateN()
+        => this as StateN<TContextManager>;
 }

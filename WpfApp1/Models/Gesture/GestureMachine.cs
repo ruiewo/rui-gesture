@@ -6,7 +6,7 @@ using System.Drawing;
 using Core;
 using UserScript;
 
-public class GestureMachine : GestureMachine<GestureMachineConfig, ContextManager>
+public class GestureMachine : GestureMachine<ContextManager>
 {
     private readonly CallbackManager customCallbackManager;
 

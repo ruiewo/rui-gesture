@@ -1,10 +1,9 @@
-﻿namespace Crevice.UI;
+﻿namespace RuiGesture.Models;
 
 using System;
 using System.Collections.Generic;
-using RuiGesture.Models;
-using RuiGesture.Models.Core;
-using RuiGesture.Models.Gesture;
+using Core;
+using Gesture;
 
 public partial class ClusterMainForm : MainFormBase
 {

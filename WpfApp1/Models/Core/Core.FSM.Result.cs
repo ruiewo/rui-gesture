@@ -1,13 +1,12 @@
 ﻿namespace RuiGesture.Models.Core;
 
-public struct Result<TConfig, TContextManager>
-    where TConfig : GestureMachineConfig
+public struct Result<TContextManager>
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
     public readonly bool EventIsConsumed;
-    public readonly State<TConfig, TContextManager> NextState;
+    public readonly State<TContextManager> NextState;
 
-    public Result(bool eventIsConsumed, State<TConfig, TContextManager> nextState)
+    public Result(bool eventIsConsumed, State<TContextManager> nextState)
     {
         EventIsConsumed = eventIsConsumed;
         NextState = nextState;
@@ -16,13 +15,10 @@ public struct Result<TConfig, TContextManager>
 
 public static class Result
 {
-    public static Result<TConfig, TContextManager>
-        Create<TConfig, TContextManager>(
-            bool eventIsConsumed,
-            State<TConfig, TContextManager> nextState)
-        where TConfig : GestureMachineConfig
+    public static Result<TContextManager>
+        Create<TContextManager>(bool eventIsConsumed, State<TContextManager> nextState)
         where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
     {
-        return new Result<TConfig, TContextManager>(eventIsConsumed, nextState);
+        return new Result<TContextManager>(eventIsConsumed, nextState);
     }
 }

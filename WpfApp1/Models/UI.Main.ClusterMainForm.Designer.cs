@@ -1,4 +1,4 @@
-﻿namespace Crevice.UI
+﻿namespace RuiGesture.Models
 {
     partial class ClusterMainForm
     {

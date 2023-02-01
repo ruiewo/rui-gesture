@@ -1,11 +1,10 @@
-﻿namespace Crevice.UI;
+﻿namespace RuiGesture.Models;
 
 using System;
 using System.Drawing;
-using RuiGesture.Models;
-using RuiGesture.Models.Core;
-using RuiGesture.Models.WinApi;
-using RuiGesture.Models.UserScript;
+using Core;
+using UserScript;
+using WinApi;
 
 public class MouseGestureForm : Form
 {

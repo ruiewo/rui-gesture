@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿namespace RuiGesture.Models;
+
+using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Windows.Forms;
-
-namespace Crevice.UI;
-
-using RuiGesture.Models.Config;
+using Config;
 
 public partial class ProductInfoForm : Form
 {

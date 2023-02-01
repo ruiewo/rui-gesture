@@ -9,8 +9,7 @@ using Core;
 using WinApi;
 using UserScript;
 
-public class CallbackManager :
-    CallbackManager<GestureMachineConfig, ContextManager>,
+public class CallbackManager : CallbackManager<ContextManager>,
     IDisposable
 {
     public class ActionExecutor : IDisposable
@@ -76,7 +75,7 @@ public class CallbackManager :
     }
 
     public override void OnStrokeReset(
-        GestureMachine<GestureMachineConfig, ContextManager> gestureMachine,
+        GestureMachine<ContextManager> gestureMachine,
         StrokeWatcher lastStrokeWatcher,
         StrokeWatcher currentStrokeWatcher)
     {
@@ -121,9 +120,9 @@ public class CallbackManager :
     internal HashSet<PhysicalSystemKey> TimeoutKeyboardKeys { get; private set; } = new();
 
     public override void OnStateChanged(
-        GestureMachine<GestureMachineConfig, ContextManager> gestureMachine,
-        State<GestureMachineConfig, ContextManager> lastState,
-        State<GestureMachineConfig, ContextManager> currentState)
+        GestureMachine<ContextManager> gestureMachine,
+        State<ContextManager> lastState,
+        State<ContextManager> currentState)
     {
         Verbose.Print($"State was changed; CurrentState={currentState}");
         if (lastState != null && lastState.IsState0 && currentState.IsStateN)
@@ -136,8 +135,8 @@ public class CallbackManager :
     }
 
     public override void OnGestureCanceled(
-        GestureMachine<GestureMachineConfig, ContextManager> gestureMachine,
-        StateN<GestureMachineConfig, ContextManager> stateN)
+        GestureMachine<ContextManager> gestureMachine,
+        StateN<ContextManager> stateN)
     {
         Verbose.Print("Gesture was cancelled.");
         var systemKeys = stateN.History.Records.Select(r => r.ReleaseEvent.PhysicalKey as PhysicalSystemKey);
@@ -147,8 +146,8 @@ public class CallbackManager :
     }
 
     public override void OnGestureTimeout(
-        GestureMachine<GestureMachineConfig, ContextManager> gestureMachine,
-        StateN<GestureMachineConfig, ContextManager> stateN)
+        GestureMachine<ContextManager> gestureMachine,
+        StateN<ContextManager> stateN)
     {
         Verbose.Print("Gesture was timeout.");
         var systemKeys = stateN.History.Records.Select(r => r.ReleaseEvent.PhysicalKey as PhysicalSystemKey);
@@ -166,25 +165,20 @@ public class CallbackManager :
     }
 
     public override void OnMachineReset(
-        GestureMachine<GestureMachineConfig, ContextManager>
-            gestureMachine,
-        State<GestureMachineConfig, ContextManager> state)
+        GestureMachine<ContextManager> gestureMachine,
+        State<ContextManager> state)
     {
         Verbose.Print($"GestureMachine was reset; LastState={state}");
         OnMachineReset(gestureMachine, state);
     }
 
-    public override void OnMachineStart(
-        GestureMachine<GestureMachineConfig, ContextManager>
-            gestureMachine)
+    public override void OnMachineStart(GestureMachine<ContextManager> gestureMachine)
     {
         Verbose.Print("GestureMachine was started.");
         OnMachineStart(gestureMachine);
     }
 
-    public override void OnMachineStop(
-        GestureMachine<GestureMachineConfig, ContextManager>
-            gestureMachine)
+    public override void OnMachineStop(GestureMachine<ContextManager> gestureMachine)
     {
         Verbose.Print("GestureMachine was stopped.");
         OnMachineStop(gestureMachine);

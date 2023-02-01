@@ -8,9 +8,7 @@ public interface IStrokeCallbackManager
     void OnStrokeUpdated(StrokeWatcher strokeWatcher, IReadOnlyList<Stroke> strokes);
 }
 
-public class CallbackManager<TConfig, TContextManager>
-    : IStrokeCallbackManager
-    where TConfig : GestureMachineConfig
+public class CallbackManager<TContextManager> : IStrokeCallbackManager
     where TContextManager : ContextManager<EvaluationContext, ExecutionContext>
 {
     public class CallbackContainer
@@ -86,7 +84,7 @@ public class CallbackManager<TConfig, TContextManager>
     public delegate void StrokeResetEventHandler(object sender, StrokeResetEventArgs e);
 
     public virtual void OnStrokeReset(
-        GestureMachine<TConfig, TContextManager> gestureMachine,
+        GestureMachine<TContextManager> gestureMachine,
         StrokeWatcher lastStrokeWatcher,
         StrokeWatcher currentStrokeWatcher)
         => Callback.OnStrokeReset(gestureMachine, new StrokeResetEventArgs(lastStrokeWatcher, currentStrokeWatcher));
@@ -116,12 +114,12 @@ public class CallbackManager<TConfig, TContextManager>
 
     public class StateChangedEventArgs : EventArgs
     {
-        public readonly State<TConfig, TContextManager> LastState;
-        public readonly State<TConfig, TContextManager> CurrentState;
+        public readonly State<TContextManager> LastState;
+        public readonly State<TContextManager> CurrentState;
 
         public StateChangedEventArgs(
-            State<TConfig, TContextManager> lastState,
-            State<TConfig, TContextManager> currentState)
+            State<TContextManager> lastState,
+            State<TContextManager> currentState)
         {
             LastState = lastState;
             CurrentState = currentState;
@@ -131,9 +129,9 @@ public class CallbackManager<TConfig, TContextManager>
     public delegate void StateChangedEventHandler(object sender, StateChangedEventArgs e);
 
     public virtual void OnStateChanged(
-        GestureMachine<TConfig, TContextManager> gestureMachine,
-        State<TConfig, TContextManager> lastState,
-        State<TConfig, TContextManager> currentState)
+        GestureMachine<TContextManager> gestureMachine,
+        State<TContextManager> lastState,
+        State<TContextManager> currentState)
         => Callback.OnStateChanged(gestureMachine, new StateChangedEventArgs(lastState, currentState));
 
     #endregion
@@ -142,9 +140,9 @@ public class CallbackManager<TConfig, TContextManager>
 
     public class GestureCanceledEventArgs : EventArgs
     {
-        public readonly StateN<TConfig, TContextManager> LastState;
+        public readonly StateN<TContextManager> LastState;
 
-        public GestureCanceledEventArgs(StateN<TConfig, TContextManager> stateN)
+        public GestureCanceledEventArgs(StateN<TContextManager> stateN)
         {
             LastState = stateN;
         }
@@ -153,8 +151,8 @@ public class CallbackManager<TConfig, TContextManager>
     public delegate void GestureCanceledEventHandler(object sender, GestureCanceledEventArgs e);
 
     public virtual void OnGestureCanceled(
-        GestureMachine<TConfig, TContextManager> gestureMachine,
-        StateN<TConfig, TContextManager> stateN)
+        GestureMachine<TContextManager> gestureMachine,
+        StateN<TContextManager> stateN)
         => Callback.OnGestureCanceled(gestureMachine, new GestureCanceledEventArgs(stateN));
 
     #endregion
@@ -163,9 +161,9 @@ public class CallbackManager<TConfig, TContextManager>
 
     public class GestureTimeoutEventArgs : EventArgs
     {
-        public readonly StateN<TConfig, TContextManager> LastState;
+        public readonly StateN<TContextManager> LastState;
 
-        public GestureTimeoutEventArgs(StateN<TConfig, TContextManager> stateN)
+        public GestureTimeoutEventArgs(StateN<TContextManager> stateN)
         {
             LastState = stateN;
         }
@@ -174,8 +172,8 @@ public class CallbackManager<TConfig, TContextManager>
     public delegate void GestureTimeoutEventHandler(object sender, GestureTimeoutEventArgs e);
 
     public virtual void OnGestureTimeout(
-        GestureMachine<TConfig, TContextManager> gestureMachine,
-        StateN<TConfig, TContextManager> stateN)
+        GestureMachine<TContextManager> gestureMachine,
+        StateN<TContextManager> stateN)
         => Callback.OnGestureTimeout(gestureMachine, new GestureTimeoutEventArgs(stateN));
 
     #endregion
@@ -184,9 +182,9 @@ public class CallbackManager<TConfig, TContextManager>
 
     public class MachineResetEventArgs : EventArgs
     {
-        public readonly State<TConfig, TContextManager> LastState;
+        public readonly State<TContextManager> LastState;
 
-        public MachineResetEventArgs(State<TConfig, TContextManager> lastState)
+        public MachineResetEventArgs(State<TContextManager> lastState)
         {
             LastState = lastState;
         }
@@ -195,8 +193,8 @@ public class CallbackManager<TConfig, TContextManager>
     public delegate void MachineResetEventHandler(object sender, MachineResetEventArgs e);
 
     public virtual void OnMachineReset(
-        GestureMachine<TConfig, TContextManager> gestureMachine,
-        State<TConfig, TContextManager> state)
+        GestureMachine<TContextManager> gestureMachine,
+        State<TContextManager> state)
         => Callback.OnMachineReset(gestureMachine, new MachineResetEventArgs(state));
 
     #endregion
@@ -210,7 +208,7 @@ public class CallbackManager<TConfig, TContextManager>
     public delegate void MachineStartEventHandler(object sender, MachineStartEventArgs e);
 
     public virtual void OnMachineStart(
-        GestureMachine<TConfig, TContextManager> gestureMachine)
+        GestureMachine<TContextManager> gestureMachine)
         => Callback.OnMachineStart(gestureMachine, new MachineStartEventArgs());
 
     #endregion
@@ -224,7 +222,7 @@ public class CallbackManager<TConfig, TContextManager>
     public delegate void MachineStopEventHandler(object sender, MachineStopEventArgs e);
 
     public virtual void OnMachineStop(
-        GestureMachine<TConfig, TContextManager> gestureMachine)
+        GestureMachine<TContextManager> gestureMachine)
         => Callback.OnMachineStop(gestureMachine, new MachineStopEventArgs());
 
     #endregion

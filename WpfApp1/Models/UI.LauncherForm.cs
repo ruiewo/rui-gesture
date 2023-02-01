@@ -1,13 +1,12 @@
-﻿namespace Crevice.UI;
+﻿namespace RuiGesture.Models;
 
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using RuiGesture.Models;
 using System.IO;
 using System.Runtime.InteropServices;
-using RuiGesture.Models.Config;
+using Config;
 
 public partial class LauncherForm : Form
 {

@@ -73,7 +73,7 @@ public class ContextManager : ContextManager<EvaluationContext, Core.ExecutionCo
 
     public override void Execute(
         Core.ExecutionContext execContext,
-        ExecuteAction<Core.ExecutionContext> executeAction)
+        ExecuteAction executeAction)
     {
         var task = _executionTaskFactory.StartNew(() => { executeAction(execContext); });
     }
