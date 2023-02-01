@@ -1,13 +1,10 @@
 ﻿namespace RuiGesture.ViewModels;
 
-using System.Drawing;
 using System.Runtime.InteropServices;
-using Models;
-using Models.Event;
-using Models.Gesture;
-using Models.Hook;
 using System;
 using System.Diagnostics;
+using Models.Core;
+using Models.WinApi;
 
 public class MainWindowViewModel
 {
@@ -39,8 +36,6 @@ public class MainWindowViewModel
     {
         SetHook();
     }
-
-    public virtual GestureMachine GestureMachine { get; }
 
 
     ~MainWindowViewModel()
@@ -84,81 +79,6 @@ public class MainWindowViewModel
         UnhookWindowsHookEx(hHook);
     }
 
-    public WindowsHook.Result MouseProc(LowLevelMouseHook.Event evnt, LowLevelMouseHook.MSLLHOOKSTRUCT data)
-    {
-        if (data.FromCreviceApp)
-        {
-            Verbose.Print($"MouseEvent(event={Enum.GetName(typeof(LowLevelMouseHook.Event), evnt)}, " +
-                          $"dwExtraInfo={BitConverter.ToString(BitConverter.GetBytes((int)data.dwExtraInfo))}) " +
-                          "was passed to the next hook because this event has the signature of CreviceApp");
-            return WindowsHook.Result.Transfer;
-        }
-        else if (data.FromTablet)
-        {
-            Verbose.Print($"MouseEvent(event={Enum.GetName(typeof(LowLevelMouseHook.Event), evnt)}, " +
-                          $"dwExtraInfo={BitConverter.ToString(BitConverter.GetBytes((int)data.dwExtraInfo))}) " +
-                          "was passed to the next hook because this event has the signature of Tablet");
-            return WindowsHook.Result.Transfer;
-        }
-
-        var point = new Point(data.pt.x, data.pt.y);
-
-        switch (evnt)
-        {
-            case LowLevelMouseHook.Event.WM_MOUSEMOVE:
-                return ToHookResult(GestureMachine.Input(NullEvent, point));
-            case LowLevelMouseHook.Event.WM_LBUTTONDOWN:
-                return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.LButton.PressEvent, point));
-            case LowLevelMouseHook.Event.WM_LBUTTONUP:
-                return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.LButton.ReleaseEvent, point));
-            case LowLevelMouseHook.Event.WM_RBUTTONDOWN:
-                return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.RButton.PressEvent, point));
-            case LowLevelMouseHook.Event.WM_RBUTTONUP:
-                return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.RButton.ReleaseEvent, point));
-            case LowLevelMouseHook.Event.WM_MBUTTONDOWN:
-                return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.MButton.PressEvent, point));
-            case LowLevelMouseHook.Event.WM_MBUTTONUP:
-                return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.MButton.ReleaseEvent, point));
-            case LowLevelMouseHook.Event.WM_MOUSEWHEEL:
-                if (data.mouseData.asWheelDelta.delta < 0)
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.WheelDown.FireEvent, point));
-                }
-                else
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.WheelUp.FireEvent, point));
-                }
-            case LowLevelMouseHook.Event.WM_XBUTTONDOWN:
-                if (data.mouseData.asXButton.IsXButton1)
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.XButton1.PressEvent, point));
-                }
-                else
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.XButton2.PressEvent, point));
-                }
-            case LowLevelMouseHook.Event.WM_XBUTTONUP:
-                if (data.mouseData.asXButton.IsXButton1)
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.XButton1.ReleaseEvent, point));
-                }
-                else
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.XButton2.ReleaseEvent, point));
-                }
-            case LowLevelMouseHook.Event.WM_MOUSEHWHEEL:
-                if (data.mouseData.asWheelDelta.delta < 0)
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.WheelRight.FireEvent, point));
-                }
-                else
-                {
-                    return ToHookResult(GestureMachine.Input(SupportedKeys.PhysicalKeys.WheelLeft.FireEvent, point));
-                }
-        }
-
-        return WindowsHook.Result.Transfer;
-    }
 
     protected WindowsHook.Result ToHookResult(bool consumed)
         => consumed ? WindowsHook.Result.Cancel : WindowsHook.Result.Transfer;
